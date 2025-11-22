@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>PCO Message Generator</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 20px 25px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .field-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 8px;
+      box-sizing: border-box;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+      font-size: 14px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .btn-row {
+      margin-top: 15px;
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button#generateBtn {
+      background: #007bff;
+      color: #fff;
+    }
+
+    button#clearBtn {
+      background: #dc3545;
+      color: #fff;
+    }
+
+    button#copyBtn {
+      background: #28a745;
+      color: #fff;
+    }
+
+    .output-container {
+      margin-top: 20px;
+    }
+
+    .output-box {
+      width: 100%;
+      height: 280px;
+      padding: 10px;
+      border-radius: 4px;
+      border: 1px solid #999;
+      background: #1e1e1e;
+      color: #f1f1f1;
+      font-family: Consolas, monospace;
+      font-size: 13px;
+      white-space: pre-wrap;
+      overflow-y: auto;
+    }
+
+    .output-actions {
+      margin-top: 8px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <h1>PCO Message Generator</h1>
+  <div class="container">
+    <div class="field-group">
+      <label for="templateSelect">Select Message Type</label>
+      <select id="templateSelect">
+        <option value="">-- Choose an option --</option>
+        <option value="1">1. 1st Day PCO Licence Application Message</option>
+        <option value="2">2. Finalisation PCO Licence Application Message</option>
+        <option value="3">3. BIA Message</option>
+        <option value="4">4. Appointment Reminder Message</option>
+        <option value="5">5. Appointment Reminder Message (Today)</option>
+        <option value="6">6. Online Application &amp; Training Message</option>
+        <option value="7">7. Topographical Skill Assessment Training Message</option>
+        <option value="8">8. SERU Skill Assessment Training Message</option>
+      </select>
+      <div class="hint">
+        Dates use a calendar picker. Times use a clock/time picker (24-hour input, auto-formatted to 12-hour in the message).
+      </div>
+    </div>
+
+    <!-- Common fields (shown/hidden per template) -->
+    <div id="field-name" class="field-group">
+      <label for="nameInput">Name</label>
+      <input type="text" id="nameInput" placeholder="Enter full name" />
+    </div>
+
+    <div id="field-contact" class="field-group">
+      <label for="contactInput">Contact</label>
+      <input type="text" id="contactInput" placeholder="Enter contact (11 digits)" />
+    </div>
+
+    <div id="field-date" class="field-group">
+      <label for="dateInput">Date</label>
+      <input type="date" id="dateInput" />
+    </div>
+
+    <div id="field-time" class="field-group">
+      <label for="timeInput">Time</label>
+      <input type="time" id="timeInput" />
+    </div>
+
+    <div id="field-startTime" class="field-group">
+      <label for="startTimeInput">Start Time</label>
+      <input type="time" id="startTimeInput" />
+    </div>
+
+    <div id="field-due" class="field-group">
+      <label for="dueInput">Due Amount (£)</label>
+      <input type="number" id="dueInput" placeholder="Enter amount in pounds" />
+    </div>
+
+    <div id="field-dbsStatus" class="field-group">
+      <label for="dbsStatusInput">DBS Update Service Status</label>
+      <input type="text" id="dbsStatusInput" placeholder="e.g. Check or Done" />
+    </div>
+
+    <div id="field-day" class="field-group">
+      <label for="dayInput">Day (word like Today/Tomorrow/Wednesday etc.)</label>
+      <input type="text" id="dayInput" placeholder="e.g. Tomorrow" />
+    </div>
+
+    <div id="field-note" class="field-group">
+      <label for="noteInput">Note (optional)</label>
+      <textarea id="noteInput" placeholder="Enter an optional note"></textarea>
+    </div>
+
+    <div id="field-clientType" class="field-group">
+      <label for="clientTypeSelect">Client Type</label>
+      <select id="clientTypeSelect">
+        <option value="New">New</option>
+        <option value="Existing">Existing</option>
+      </select>
+    </div>
+
+    <div id="field-examType" class="field-group">
+      <label for="examTypeSelect">Exam Type</label>
+      <select id="examTypeSelect">
+        <option value="SERU and English Test Initial Assessment">
+          SERU and English Test Initial Assessment
+        </option>
+        <option value="Topographical Test Initial Assessment">
+          Topographical Test Initial Assessment
+        </option>
+      </select>
+    </div>
+
+    <div class="btn-row">
+      <button id="generateBtn">Generate</button>
+    </div>
+
+    <div class="output-container">
+      <label>Generated Message</label>
+      <div id="outputBox" class="output-box"></div>
+      <div class="output-actions">
+        <button id="clearBtn">Clear</button>
+        <button id="copyBtn">Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ---------- Utility functions ----------
+
+    // dateStr from <input type="date"> is "YYYY-MM-DD"
+    function getDayNameFromISO(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "";
+      const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+      return days[d.getDay()] || "";
+    }
+
+    // Convert "YYYY-MM-DD" -> "DD/MM/YYYY"
+    function formatDateDDMMYYYY(dateStr) {
+      if (!dateStr) return "";
+      const d = new Date(dateStr);
+      if (isNaN(d.getTime())) return "";
+      const dd = String(d.getDate()).padStart(2, "0");
+      const mm = String(d.getMonth() + 1).padStart(2, "0");
+      const yyyy = d.getFullYear();
+      return `${dd}/${mm}/${yyyy}`;
+    }
+
+    // timeStr is "HH:MM" (24h) from <input type="time">
+    function to12Hour(timeStr) {
+      if (!timeStr) return "";
+      const parts = timeStr.split(":");
+      if (parts.length < 2) return "";
+      let h = parseInt(parts[0], 10);
+      const m = parts[1];
+      if (isNaN(h)) return "";
+      const suffix = h >= 12 ? "pm" : "am";
+      let h12 = h % 12;
+      if (h12 === 0) h12 = 12;
+      const hh = String(h12).padStart(2, "0");
+      return `${hh}:${m} ${suffix}`;
+    }
+
+    // Add hours to a "HH:MM" string and return formatted 12h time.
+    function addHoursAndFormat(startTimeStr, hoursToAdd) {
+      if (!startTimeStr) return "";
+      const parts = startTimeStr.split(":");
+      if (parts.length < 2) return "";
+      let h = parseInt(parts[0], 10);
+      let m = parseInt(parts[1], 10);
+      if (isNaN(h) || isNaN(m)) return "";
+
+      const d = new Date(2000, 0, 1, h, m);
+      d.setHours(d.getHours() + hoursToAdd);
+
+      const h24 = d.getHours();
+      const mm = String(d.getMinutes()).padStart(2, "0");
+      return to12Hour(`${String(h24).padStart(2, "0")}:${mm}`);
+    }
+
+    function validateContact(contact) {
+      return contact && contact.length === 11;
+    }
+
+    // ---------- Message Generators ----------
+
+    function generateFirstDayMessage(name, contact, dateISO, time24) {
+      const dateStr = formatDateDDMMYYYY(dateISO);
+      const dayName = getDayNameFromISO(dateISO);
+      const timeStr = to12Hour(time24);
+
+      return `
+Dear ${name},
+${contact}
+
+As discussed, Booked appointment for *PCO Licence Application* on following date and time.
+
+
+*Date- ${dateStr}*
+*Day – ${dayName}*
+*Time- ${timeStr}*
+
+*Please bring with you the following documents to start your application:*
+
+-       Passport
+
+-       Driving Licence
+
+-       Residence permit card (if you have one)
+
+-       One Utility Bill or Bank statement (under three months) as proof of current address
+
+-       National Insurance Number
+
+-       Last five-year address history
+
+*Initial payment- £100 (£50 for processing application and £50 deposit for training)*
+
+*Office address-*
+Us & Co. 
+11 Burford Road
+Stratford, London
+E15 2ST
+*Office location Google Link:*
+https://maps.app.goo.gl/VUaC3dh3mpDG9WcS9
+
+Please let us know in advance if any changes.
+
+*Parking and info-*
+You can park your car in the following address , *FREE Parking* from 12pm Monday to Friday, Weekend All day FREE.
+*Bridge Rd, London E15 3PB*
+
+*On  Event days*: Park in
+*Westfield or*
+*Stratford Multi-Story Car Park*
+London E15 1XE
+
+*Public Transport Info:*
+Nearest Station: *Stratford High Street DLR*
+or Stratford Main Station (5 mins walk) 
+
+
+Kind Regards,
+*PCO Licence Services*
+*0208 226 0362 / 07399 317 660*
+www.pcolicenceservices.co.uk
+`;
+    }
+
+    function generatePCOFinalisationMessage(name, contact, dateISO, time24, due) {
+      const dateStr = formatDateDDMMYYYY(dateISO);
+      const dayName = getDayNameFromISO(dateISO);
+      const timeStr = to12Hour(time24);
+
+      return `
+Dear ${name},
+${contact}
+
+As discussed, Booked appointment for *Finalisation PCO Licence Application* on following date and time.
+
+
+Date- ${dateStr}
+Day – ${dayName}
+Time- ${timeStr}
+
+*Please bring with you the following documents to start your application:*
+
+-       Passport
+
+-       Driving Licence
+
+-       Residence permit card (if you have one)
+
+-       One Utility Bill or Bank statement (under three months) as proof of current address
+
+-       National Insurance Number
+
+-       Last five-year address history
+
+
+*Our payment- £${due}*
+
+
+*Office address-*
+Us & Co. 
+11 Burford Road
+Stratford, London
+E15 2ST
+Office-206
+*Office location Link:*https://maps.app.goo.gl/VUaC3dh3mpDG9WcS9
+
+Please let me know in advance if any changes.
+
+*Parking and info-*
+You can park your car in the following address , FREE Parking from 12pm.
+Bridge Rd, London E15 3PB
+Parking location Link: https://maps.app.goo.gl/QjzVt8qisRhU1bTp9
+
+*Public Transport Info:*
+Nearest Station: Stratford High Street DLR
+Link for Station: https://maps.app.goo.gl/HxYw5gKcCrrxbB3h6
+
+
+Kind Regards,
+Mo.
+Operation Manager
+*PCO Licence Services*
+0208 226 0362 / 07399 317 660
+www.pcolicenceservices.co.uk 
+`;
+    }
+
+    function generateBIAExistingMessage(name, type, contact, exam, dateISO, time24, note) {
+      const dateStr = formatDateDDMMYYYY(dateISO);
+      const dayName = getDayNameFromISO(dateISO);
+      const timeStr = to12Hour(time24);
+
+      return `
+Dear ${name}, (${type} Client)
+${contact}
+
+As discussed, Booked appointment for *${exam}* at the following date and time.
+
+Date-- ${dateStr}
+Day – ${dayName}
+Time--   ${timeStr}    (Appointments can take up to one hour long)
+
+${note}
+
+*Office address-*
+Us & Co.
+11 Burford Road
+Stratford, London
+E15 2ST
+Office-206
+Office Location Link: https://maps.app.goo.gl/VUaC3dh3mpDG9WcS9
+
+
+Please let us know in advance if any changes.
+
+
+*Parking and info-*
+You can park your car in the following address , Free Parking  from 12pm.
+Bridge Rd, London E15 3PB
+Parking location Link: https://maps.app.goo.gl/QjzVt8qisRhU1bTp9
+
+
+*Public Transport Info:*
+Nearest Station: Stratford High Street DLR
+Link for Station: https://maps.app.goo.gl/HxYw5gKcCrrxbB3h6
+
+Kind Regards,
+Mo.
+Operation Manager
+*PCO Licence Services*
+0208 226 0362 / 07399 317 660
+www.pcolicenceservices.co.uk
+`;
+    }
+
+    function generateAppointmentReminderMessage(day, time24) {
+      const timeStr = to12Hour(time24);
+
+      return `
+*Appointment Reminder*
+
+Dear Sir/Madam,
+
+This is just a quick reminder of your appointment with us *${day} at ${timeStr}*
+
+We will see you *${day}.*
+
+Have a great day.
+
+Kind Regards,
+Mo.
+*PCO Licence Services*
+
+Address:
+Us & Co, 11 Burford Road,
+Stratford, London, 
+E15 2ST
+
+Phone/WhatsApp: 0208 226 0362 / 07399 317 660
+
+Email: info@pcolicenecservices.co.uk
+
+Website: www.pcolicenecservices.co.uk
+`;
+    }
+
+    function generateAppointmentReminderMessageToday(time24) {
+      const timeStr = to12Hour(time24);
+
+      return `
+*Appointment Reminder*
+
+Dear Sir/Madam,
+
+This is just a quick reminder of your appointment with us *Today at ${timeStr}*
+
+See you soon.
+
+Kind Regards,
+Mo.
+*PCO Licence Services*
+
+Address:
+Us & Co, 11 Burford Road,
+Stratford, London, 
+E15 2ST
+
+Phone/WhatsApp: 0208 226 0362 / 07399 317 660
+
+Email: info@pcolicenecservices.co.uk
+
+Website: www.pcolicenecservices.co.uk
+`;
+    }
+
+    function generateOnlineApplicationAndTrainingMessage(name, dbsStatus, contact, dateISO, startTime24) {
+      const dateStr = formatDateDDMMYYYY(dateISO);
+      const dayName = getDayNameFromISO(dateISO);
+      const startStr = to12Hour(startTime24);
+      const endStr = addHoursAndFormat(startTime24, 5);
+
+      return `
+*Please must read all below information*
+ 
+Dear ${name}, (DBS update service- ${dbsStatus.charAt(0).toUpperCase() + dbsStatus.slice(1)})
+${contact}
+
+ 
+As discussed, Booked appointment for *Online Application & Topographical Skill assessment training* at the following date and time.
+ 
+Date- ${dateStr}
+Day-  ${dayName}
+Time- ${startStr} - ${endStr}
+ 
+Please bring with you the following documents:
+ 
+ 
+•             Payment card details to make TFL initial fee for PCO licence/Badge = *£124*
+ 
+•             Completed Medical form
+ 
+•             Right to work share code (If necessary)
+ 
+•             One Copy Passport Size Picture
+
+•             Name Change Deed Certificate 
+
+ 
+ 
+*Our Payment- £250*
+
+*Office address-*
+Us & Co.
+11 Burford Road
+Stratford, London
+E15 2ST
+Office-206
+ 
+*Note- You cannot Cancel or reschedule this appointment as upon doing so £60 charge will be added to your account balance*
+ 
+*Parking and info-*
+You can park your car in the following address, FREE Parking from 12pm.
+Bridge Rd, London E15 3PB
+Parking location Link: https://maps.app.goo.gl/QjzVt8qisRhU1bTp9
+
+ 
+Kind Regards,
+Mo.
+Operation Manager
+*PCO Licence Services*
+0208 226 0362 / 07399 317 660
+www.pcolicenceservices.co.uk
+`;
+    }
+
+    function generateTopographicalSkillTrainingMessage(name, note, contact, dateISO, startTime24, due) {
+      const dateStr = formatDateDDMMYYYY(dateISO);
+      const dayName = getDayNameFromISO(dateISO);
+      const startStr = to12Hour(startTime24);
+      const endStr = addHoursAndFormat(startTime24, 5);
+
+      return `
+*Please must read all below information*
+ 
+Dear ${name}, ${note}
+${contact}
+
+ 
+As discussed, Booked appointment for *Topographical Skill Assessment Training* at the following date and time.
+ 
+Date- ${dateStr}
+Day- ${dayName}
+Time- ${startStr} - ${endStr}
+
+ 
+*Our Payment- £${due}*
+
+*Office address-*
+Us & Co.
+11 Burford Road
+Stratford, London
+E15 2ST
+Office-206
+ 
+*Note- You cannot Cancel or reschedule this appointment as upon doing so £60 charge will be added to your account balance*
+ 
+*Parking and info-*
+You can park your car in the following address, FREE Parking from 12pm.
+Bridge Rd, London E15 3PB
+Parking location Link: https://maps.app.goo.gl/QjzVt8qisRhU1bTp9
+
+ 
+Kind Regards,
+Mo.
+Operation Manager
+*PCO Licence Services*
+0208 226 0362 / 07399 317 660
+www.pcolicenceservices.co.uk
+`;
+    }
+
+    function generateSERUSkillTrainingMessage(name, note, contact, dateISO, startTime24, due) {
+      const dateStr = formatDateDDMMYYYY(dateISO);
+      const dayName = getDayNameFromISO(dateISO);
+      const startStr = to12Hour(startTime24);
+      const endStr = addHoursAndFormat(startTime24, 5);
+
+      return `
+*Please must read all below information*
+ 
+Dear ${name}, ${note}
+${contact} 
+
+As discussed, Booked appointment for *SERU Skill Assessment Training* at the following date and time.
+ 
+Date- ${dateStr}
+Day- ${dayName}
+Time- ${startStr} - ${endStr}
+ 
+*Our Payment- £${due}*
+
+*Office address-*
+Us & Co.
+11 Burford Road
+Stratford, London
+E15 2ST
+Office-206
+ 
+*Note- You cannot Cancel or reschedule this appointment as upon doing so £60 charge will be added to your account balance*
+ 
+*Parking and info-*
+You can park your car in the following address, FREE Parking from 12pm.
+Bridge Rd, London E15 3PB
+Parking location Link: https://maps.app.goo.gl/QjzVt8qisRhU1bTp9
+
+Kind Regards,
+Mo.
+Operation Manager
+*PCO Licence Services*
+0208 226 0362 / 07399 317 660
+www.pcolicenceservices.co.uk
+`;
+    }
+
+    // ---------- UI Logic ----------
+
+    const templateSelect   = document.getElementById("templateSelect");
+    const outputBox        = document.getElementById("outputBox");
+
+    const fields = {
+      name:       document.getElementById("field-name"),
+      contact:    document.getElementById("field-contact"),
+      date:       document.getElementById("field-date"),
+      time:       document.getElementById("field-time"),
+      startTime:  document.getElementById("field-startTime"),
+      due:        document.getElementById("field-due"),
+      dbsStatus:  document.getElementById("field-dbsStatus"),
+      day:        document.getElementById("field-day"),
+      note:       document.getElementById("field-note"),
+      clientType: document.getElementById("field-clientType"),
+      examType:   document.getElementById("field-examType")
+    };
+
+    const inputs = {
+      name:       document.getElementById("nameInput"),
+      contact:    document.getElementById("contactInput"),
+      date:       document.getElementById("dateInput"),
+      time:       document.getElementById("timeInput"),
+      startTime:  document.getElementById("startTimeInput"),
+      due:        document.getElementById("dueInput"),
+      dbsStatus:  document.getElementById("dbsStatusInput"),
+      day:        document.getElementById("dayInput"),
+      note:       document.getElementById("noteInput"),
+      clientType: document.getElementById("clientTypeSelect"),
+      examType:   document.getElementById("examTypeSelect")
+    };
+
+    const templateFields = {
+      "1": ["name", "contact", "date", "time"],
+      "2": ["name", "contact", "date", "time", "due"],
+      "3": ["name", "contact", "date", "time", "clientType", "examType"],
+      "4": ["day", "time"],
+      "5": ["time"],
+      "6": ["name", "dbsStatus", "contact", "date", "startTime"],
+      "7": ["name", "note", "contact", "date", "startTime", "due"],
+      "8": ["name", "note", "contact", "date", "startTime", "due"]
+    };
+
+    function updateFieldVisibility() {
+      const value = templateSelect.value;
+      Object.keys(fields).forEach(key => {
+        fields[key].style.display = "none";
+      });
+      if (!value || !templateFields[value]) return;
+      templateFields[value].forEach(key => {
+        fields[key].style.display = "block";
+      });
+    }
+
+    templateSelect.addEventListener("change", updateFieldVisibility);
+    updateFieldVisibility(); // initial
+
+    document.getElementById("generateBtn").addEventListener("click", () => {
+      const t = templateSelect.value;
+      if (!t) {
+        alert("Please select a message type first.");
+        return;
+      }
+
+      let msg = "";
+
+      if (t === "1") {
+        const name = inputs.name.value.trim();
+        const contact = inputs.contact.value.trim();
+        const dateISO = inputs.date.value.trim();
+        const time24 = inputs.time.value.trim();
+
+        if (!validateContact(contact)) {
+          alert("Contact must be exactly 11 digits.");
+          return;
+        }
+
+        msg = generateFirstDayMessage(name, contact, dateISO, time24);
+
+      } else if (t === "2") {
+        const name = inputs.name.value.trim();
+        const contact = inputs.contact.value.trim();
+        const dateISO = inputs.date.value.trim();
+        const time24 = inputs.time.value.trim();
+        const due = inputs.due.value.trim();
+
+        if (!validateContact(contact)) {
+          alert("Contact must be exactly 11 digits.");
+          return;
+        }
+
+        msg = generatePCOFinalisationMessage(name, contact, dateISO, time24, due);
+
+      } else if (t === "3") {
+        let clientType = inputs.clientType.value;
+        const exam = inputs.examType.value;
+        const name = inputs.name.value.trim();
+        const contact = inputs.contact.value.trim();
+        const dateISO = inputs.date.value.trim();
+        const time24 = inputs.time.value.trim();
+
+        if (!validateContact(contact)) {
+          alert("Contact must be exactly 11 digits.");
+          return;
+        }
+
+        let note;
+        if (clientType === "New") {
+          note = "*Note: You may need to pay some deposit towards the agreed future training on that day if you want to get training with us and pass the exam*";
+        } else {
+          note = "";
+        }
+
+        msg = generateBIAExistingMessage(name, clientType, contact, exam, dateISO, time24, note);
+
+      } else if (t === "4") {
+        const day = inputs.day.value.trim();
+        const time24 = inputs.time.value.trim();
+        msg = generateAppointmentReminderMessage(day, time24);
+
+      } else if (t === "5") {
+        const time24 = inputs.time.value.trim();
+        msg = generateAppointmentReminderMessageToday(time24);
+
+      } else if (t === "6") {
+        const name = inputs.name.value.trim();
+        const dbsStatus = inputs.dbsStatus.value.trim();
+        const contact = inputs.contact.value.trim();
+        const dateISO = inputs.date.value.trim();
+        const startTime24 = inputs.startTime.value.trim();
+
+        if (!validateContact(contact)) {
+          alert("Contact must be exactly 11 digits.");
+          return;
+        }
+
+        msg = generateOnlineApplicationAndTrainingMessage(
+          name,
+          dbsStatus,
+          contact,
+          dateISO,
+          startTime24
+        );
+
+      } else if (t === "7") {
+        const name = inputs.name.value.trim();
+        let note = inputs.note.value.trim();
+        if (note) {
+          note = "(" + note + ")";
+        }
+        const contact = inputs.contact.value.trim();
+        const dateISO = inputs.date.value.trim();
+        const startTime24 = inputs.startTime.value.trim();
+        const due = inputs.due.value.trim();
+
+        if (!validateContact(contact)) {
+          alert("Contact must be exactly 11 digits.");
+          return;
+        }
+
+        msg = generateTopographicalSkillTrainingMessage(
+          name,
+          note,
+          contact,
+          dateISO,
+          startTime24,
+          due
+        );
+
+      } else if (t === "8") {
+        const name = inputs.name.value.trim();
+        let note = inputs.note.value.trim();
+        if (note) {
+          note = "(" + note + ")";
+        }
+        const contact = inputs.contact.value.trim();
+        const dateISO = inputs.date.value.trim();
+        const startTime24 = inputs.startTime.value.trim();
+        const due = inputs.due.value.trim();
+
+        if (!validateContact(contact)) {
+          alert("Contact must be exactly 11 digits.");
+          return;
+        }
+
+        msg = generateSERUSkillTrainingMessage(
+          name,
+          note,
+          contact,
+          dateISO,
+          startTime24,
+          due
+        );
+      }
+
+      outputBox.textContent = msg;
+    });
+
+    // Clear button: reload whole page
+    document.getElementById("clearBtn").addEventListener("click", () => {
+      location.reload();
+    });
+
+    // Copy button: copy output box content
+    document.getElementById("copyBtn").addEventListener("click", async () => {
+      const text = outputBox.textContent || "";
+      if (!text.trim()) {
+        alert("Nothing to copy.");
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(text);
+        alert("Message copied to clipboard!");
+      } catch (err) {
+        console.error(err);
+        alert("Failed to copy. Your browser may block clipboard access.");
+      }
+    });
+  </script>
+</body>
+</html>
