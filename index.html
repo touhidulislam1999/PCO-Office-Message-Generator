@@ -795,7 +795,7 @@ www.pcolicenceservices.co.uk
 
       if (t === "1") {
         const name = inputs.name.value.trim();
-        const contact = inputs.contact.value.trim();
+        const contact = inputs.contact.value.trim().replace(/\D/g, "");
         const dateISO = inputs.date.value.trim();
         const time24 = inputs.time.value.trim();
 
@@ -803,16 +803,16 @@ www.pcolicenceservices.co.uk
           alert("Contact must be exactly 11 digits.");
           return;
         }
-        if (!isValidHalfHour(time24)) {
+        /*if (!isValidHalfHour(time24)) {
           alert("Time minutes must be 00 or 30.");
           return;
-        }
+        }*/
 
         msg = generateFirstDayMessage(name, contact, dateISO, time24);
 
       } else if (t === "2") {
         const name = inputs.name.value.trim();
-        const contact = inputs.contact.value.trim();
+        const contact = inputs.contact.value.trim().replace(/\D/g, "");
         const dateISO = inputs.date.value.trim();
         const time24 = inputs.time.value.trim();
         const due = inputs.due.value.trim();
@@ -821,16 +821,12 @@ www.pcolicenceservices.co.uk
           alert("Contact must be exactly 11 digits.");
           return;
         }
-        if (!isValidHalfHour(time24)) {
-          alert("Time minutes must be 00 or 30.");
-          return;
-        }
 
         msg = generateRenewalMessage(name, contact, dateISO, time24, due);
 
       } else if (t === "3") {
         const name = inputs.name.value.trim();
-        const contact = inputs.contact.value.trim();
+        const contact = inputs.contact.value.trim().replace(/\D/g, "");
         const dateISO = inputs.date.value.trim();
         const time24 = inputs.time.value.trim();
         const due = inputs.due.value.trim();
@@ -850,7 +846,7 @@ www.pcolicenceservices.co.uk
         let clientType = inputs.clientType.value;
         const exam = inputs.examType.value;
         const name = inputs.name.value.trim();
-        const contact = inputs.contact.value.trim();
+        const contact = inputs.contact.value.trim().replace(/\D/g, "");
         const dateISO = inputs.date.value.trim();
         const time24 = inputs.time.value.trim();
 
@@ -858,10 +854,7 @@ www.pcolicenceservices.co.uk
           alert("Contact must be exactly 11 digits.");
           return;
         }
-        if (!isValidHalfHour(time24)) {
-          alert("Time minutes must be 00 or 30.");
-          return;
-        }
+        
 
         let note;
         if (clientType === "New") {
@@ -896,16 +889,12 @@ www.pcolicenceservices.co.uk
       } else if (t === "7") {
         const name = inputs.name.value.trim();
         const dbsStatus = inputs.dbsStatus.value.trim();
-        const contact = inputs.contact.value.trim();
+        const contact = inputs.contact.value.trim().replace(/\D/g, "");
         const dateISO = inputs.date.value.trim();
         const startTime24 = inputs.startTime.value.trim();
 
         if (!validateContact(contact)) {
           alert("Contact must be exactly 11 digits.");
-          return;
-        }
-        if (!isValidHalfHour(startTime24)) {
-          alert("Start time minutes must be 00 or 30.");
           return;
         }
 
@@ -923,17 +912,13 @@ www.pcolicenceservices.co.uk
         if (note) {
           note = "(" + note + ")";
         }
-        const contact = inputs.contact.value.trim();
+        const contact = inputs.contact.value.trim().replace(/\D/g, "");
         const dateISO = inputs.date.value.trim();
         const startTime24 = inputs.startTime.value.trim();
         const due = inputs.due.value.trim();
 
         if (!validateContact(contact)) {
           alert("Contact must be exactly 11 digits.");
-          return;
-        }
-        if (!isValidHalfHour(startTime24)) {
-          alert("Start time minutes must be 00 or 30.");
           return;
         }
 
@@ -952,17 +937,13 @@ www.pcolicenceservices.co.uk
         if (note) {
           note = "(" + note + ")";
         }
-        const contact = inputs.contact.value.trim();
+        const contact = inputs.contact.value.trim().replace(/\D/g, "");
         const dateISO = inputs.date.value.trim();
         const startTime24 = inputs.startTime.value.trim();
         const due = inputs.due.value.trim();
 
         if (!validateContact(contact)) {
           alert("Contact must be exactly 11 digits.");
-          return;
-        }
-        if (!isValidHalfHour(startTime24)) {
-          alert("Start time minutes must be 00 or 30.");
           return;
         }
 
