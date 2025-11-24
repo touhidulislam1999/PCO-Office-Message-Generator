@@ -116,15 +116,15 @@
       <label for="templateSelect">Select Message Type</label>
       <select id="templateSelect">
         <option value="">-- Choose an option --</option>
-        <option value="1">1. 1st Day PCO Licence Application Message</option>
-        <option value="2">2. Renewal Application Message</option>
-        <option value="3">3. Finalisation PCO Licence Application Message</option>
-        <option value="4">4. BIA Message</option>
-        <option value="5">5. Appointment Reminder Message</option>
-        <option value="6">6. Appointment Reminder Message (Today)</option>
-        <option value="7">7. Online Application &amp; Training Message</option>
-        <option value="8">8. Topographical Skill Assessment Training Message</option>
-        <option value="9">9. SERU Skill Assessment Training Message</option>
+        <option value="1">1st Day PCO Licence Application Message</option>
+        <option value="2">Renewal Application Message</option>
+        <option value="3">Finalisation PCO Licence Application Message</option>
+        <option value="4">BIA Message</option>
+        <option value="5">Appointment Reminder Message</option>
+        <option value="6">Appointment Reminder Message (Today)</option>
+        <option value="7">Online Application &amp; Training Message</option>
+        <option value="8">Topographical Skill Assessment Training Message</option>
+        <option value="9">SERU Skill Assessment Training Message</option>
       </select>
       <div class="hint">
         Dates use a calendar picker. Times use a time picker (24-hour input, auto-formatted to 12-hour in the message, minutes only <b>00</b> or <b>30</b>).
@@ -760,13 +760,14 @@ www.pcolicenceservices.co.uk
 
     const templateFields = {
       "1": ["name", "contact", "date", "time"],
-      "2": ["name", "contact", "date", "time", "due"],
-      "3": ["name", "contact", "date", "time", "clientType", "examType"],
-      "4": ["day", "time"],
-      "5": ["time"],
-      "6": ["name", "dbsStatus", "contact", "date", "startTime"],
-      "7": ["name", "note", "contact", "date", "startTime", "due"],
-      "8": ["name", "note", "contact", "date", "startTime", "due"]
+      "2": ["name", "contact", "date", "time"],
+      "3": ["name", "contact", "date", "time", "due"],
+      "4": ["name", "contact", "date", "time", "clientType", "examType"],
+      "5": ["day", "time"],
+      "6": ["time"],
+      "7": ["name", "dbsStatus", "contact", "date", "startTime"],
+      "8": ["name", "note", "contact", "date", "startTime", "due"],
+      "9": ["name", "note", "contact", "date", "startTime", "due"]
     };
 
     function updateFieldVisibility() {
