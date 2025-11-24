@@ -117,16 +117,17 @@
       <select id="templateSelect">
         <option value="">-- Choose an option --</option>
         <option value="1">1. 1st Day PCO Licence Application Message</option>
-        <option value="2">2. Finalisation PCO Licence Application Message</option>
-        <option value="3">3. BIA Message</option>
-        <option value="4">4. Appointment Reminder Message</option>
-        <option value="5">5. Appointment Reminder Message (Today)</option>
-        <option value="6">6. Online Application &amp; Training Message</option>
-        <option value="7">7. Topographical Skill Assessment Training Message</option>
-        <option value="8">8. SERU Skill Assessment Training Message</option>
+        <option value="2">2. Renewal Application Message</option>
+        <option value="3">3. Finalisation PCO Licence Application Message</option>
+        <option value="4">4. BIA Message</option>
+        <option value="5">5. Appointment Reminder Message</option>
+        <option value="6">6. Appointment Reminder Message (Today)</option>
+        <option value="7">7. Online Application &amp; Training Message</option>
+        <option value="8">8. Topographical Skill Assessment Training Message</option>
+        <option value="9">9. SERU Skill Assessment Training Message</option>
       </select>
       <div class="hint">
-        Dates use a calendar picker. Times use a clock/time picker (24-hour input, auto-formatted to 12-hour in the message).
+        Dates use a calendar picker. Times use a time picker (24-hour input, auto-formatted to 12-hour in the message, minutes only <b>00</b> or <b>30</b>).
       </div>
     </div>
 
@@ -148,12 +149,12 @@
 
     <div id="field-time" class="field-group">
       <label for="timeInput">Time</label>
-      <input type="time" id="timeInput" />
+      <input type="time" id="timeInput" step="1800" />
     </div>
 
     <div id="field-startTime" class="field-group">
       <label for="startTimeInput">Start Time</label>
-      <input type="time" id="startTimeInput" />
+      <input type="time" id="startTimeInput" step="1800" />
     </div>
 
     <div id="field-due" class="field-group">
@@ -269,6 +270,15 @@
       return contact && contact.length === 11;
     }
 
+    // Ensure minutes are only 00 or 30
+    function isValidHalfHour(timeStr) {
+      if (!timeStr) return false;
+      const parts = timeStr.split(":");
+      if (parts.length < 2) return false;
+      const mins = parseInt(parts[1], 10);
+      return mins === 0 || mins === 30;
+    }
+
     // ---------- Message Generators ----------
 
     function generateFirstDayMessage(name, contact, dateISO, time24) {
@@ -312,6 +322,77 @@ E15 2ST
 https://maps.app.goo.gl/VUaC3dh3mpDG9WcS9
 
 Please let us know in advance if any changes.
+
+*Parking and info-*
+You can park your car in the following address , *FREE Parking* from 12pm Monday to Friday, Weekend All day FREE.
+*Bridge Rd, London E15 3PB*
+
+*On  Event days*: Park in
+*Westfield or*
+*Stratford Multi-Story Car Park*
+London E15 1XE
+
+*Public Transport Info:*
+Nearest Station: *Stratford High Street DLR*
+or Stratford Main Station (5 mins walk) 
+
+
+Kind Regards,
+*PCO Licence Services*
+*0208 226 0362 / 07399 317 660*
+www.pcolicenceservices.co.uk
+`;
+    }
+
+    function generateRenewalMessage(name, contact, dateISO, time24, due) {
+      const dateStr = formatDateDDMMYYYY(dateISO);
+      const dayName = getDayNameFromISO(dateISO);
+      const timeStr = to12Hour(time24);
+
+      return `
+*Please must read all below information*
+
+Dear ${name},
+${contact}
+
+As discussed, Booked appointment for *Renewal Application Process* on following date and time.
+
+
+*Date- ${dateStr}*
+*Day – ${dayName}*
+*Time- ${timeStr}*
+
+*Documents you need to bring:*
+
+-       A recent clear passport size picture
+
+-       Driving Licence
+
+-       Passport
+
+-       One Utility Bill/Bank statement (under three months) as proof of current address
+
+-       National Insurance Number Only
+
+-       Document for name change (if you changed your name before)
+
+-       HMRC Tax code (please call 0300 200 3310 to get unique 9-digit tax check code use for Private Hire Taxi Driver)
+
+-       Last five-year address history to remember
+
+-       TPH/205 & Certificate of Good Conduct- (if you have lived outside of UK for more than 3 months in the past 3 years)
+
+
+*Our Payment- £${due}*
+
+*Office address-*
+Us & Co. 
+11 Burford Road
+Stratford, London
+E15 2ST
+*Office location Google Link:*
+https://maps.app.goo.gl/VUaC3dh3mpDG9WcS9
+
 
 *Parking and info-*
 You can park your car in the following address , *FREE Parking* from 12pm Monday to Friday, Weekend All day FREE.
@@ -389,11 +470,9 @@ Link for Station: https://maps.app.goo.gl/HxYw5gKcCrrxbB3h6
 
 
 Kind Regards,
-Mo.
-Operation Manager
 *PCO Licence Services*
-0208 226 0362 / 07399 317 660
-www.pcolicenceservices.co.uk 
+*0208 226 0362 / 07399 317 660*
+www.pcolicenceservices.co.uk
 `;
     }
 
@@ -437,10 +516,8 @@ Nearest Station: Stratford High Street DLR
 Link for Station: https://maps.app.goo.gl/HxYw5gKcCrrxbB3h6
 
 Kind Regards,
-Mo.
-Operation Manager
 *PCO Licence Services*
-0208 226 0362 / 07399 317 660
+*0208 226 0362 / 07399 317 660*
 www.pcolicenceservices.co.uk
 `;
     }
@@ -449,7 +526,7 @@ www.pcolicenceservices.co.uk
       const timeStr = to12Hour(time24);
 
       return `
-*Appointment Reminder*
+*Automated Appointment Reminder*
 
 Dear Sir/Madam,
 
@@ -480,7 +557,7 @@ Website: www.pcolicenecservices.co.uk
       const timeStr = to12Hour(time24);
 
       return `
-*Appointment Reminder*
+*Automated Appointment Reminder*
 
 Dear Sir/Madam,
 
@@ -557,10 +634,8 @@ Parking location Link: https://maps.app.goo.gl/QjzVt8qisRhU1bTp9
 
  
 Kind Regards,
-Mo.
-Operation Manager
 *PCO Licence Services*
-0208 226 0362 / 07399 317 660
+*0208 226 0362 / 07399 317 660*
 www.pcolicenceservices.co.uk
 `;
     }
@@ -603,10 +678,8 @@ Parking location Link: https://maps.app.goo.gl/QjzVt8qisRhU1bTp9
 
  
 Kind Regards,
-Mo.
-Operation Manager
 *PCO Licence Services*
-0208 226 0362 / 07399 317 660
+*0208 226 0362 / 07399 317 660*
 www.pcolicenceservices.co.uk
 `;
     }
@@ -646,10 +719,8 @@ Bridge Rd, London E15 3PB
 Parking location Link: https://maps.app.goo.gl/QjzVt8qisRhU1bTp9
 
 Kind Regards,
-Mo.
-Operation Manager
 *PCO Licence Services*
-0208 226 0362 / 07399 317 660
+*0208 226 0362 / 07399 317 660*
 www.pcolicenceservices.co.uk
 `;
     }
@@ -731,6 +802,10 @@ www.pcolicenceservices.co.uk
           alert("Contact must be exactly 11 digits.");
           return;
         }
+        if (!isValidHalfHour(time24)) {
+          alert("Time minutes must be 00 or 30.");
+          return;
+        }
 
         msg = generateFirstDayMessage(name, contact, dateISO, time24);
 
@@ -745,10 +820,32 @@ www.pcolicenceservices.co.uk
           alert("Contact must be exactly 11 digits.");
           return;
         }
+        if (!isValidHalfHour(time24)) {
+          alert("Time minutes must be 00 or 30.");
+          return;
+        }
+
+        msg = generateRenewalMessage(name, contact, dateISO, time24, due);
+
+      } else if (t === "3") {
+        const name = inputs.name.value.trim();
+        const contact = inputs.contact.value.trim();
+        const dateISO = inputs.date.value.trim();
+        const time24 = inputs.time.value.trim();
+        const due = inputs.due.value.trim();
+
+        if (!validateContact(contact)) {
+          alert("Contact must be exactly 11 digits.");
+          return;
+        }
+        if (!isValidHalfHour(time24)) {
+          alert("Time minutes must be 00 or 30.");
+          return;
+        }
 
         msg = generatePCOFinalisationMessage(name, contact, dateISO, time24, due);
 
-      } else if (t === "3") {
+      } else if (t === "4") {
         let clientType = inputs.clientType.value;
         const exam = inputs.examType.value;
         const name = inputs.name.value.trim();
@@ -758,6 +855,10 @@ www.pcolicenceservices.co.uk
 
         if (!validateContact(contact)) {
           alert("Contact must be exactly 11 digits.");
+          return;
+        }
+        if (!isValidHalfHour(time24)) {
+          alert("Time minutes must be 00 or 30.");
           return;
         }
 
@@ -770,16 +871,28 @@ www.pcolicenceservices.co.uk
 
         msg = generateBIAExistingMessage(name, clientType, contact, exam, dateISO, time24, note);
 
-      } else if (t === "4") {
+      } else if (t === "5") {
         const day = inputs.day.value.trim();
         const time24 = inputs.time.value.trim();
+
+        if (!isValidHalfHour(time24)) {
+          alert("Time minutes must be 00 or 30.");
+          return;
+        }
+
         msg = generateAppointmentReminderMessage(day, time24);
 
-      } else if (t === "5") {
+      } else if (t === "6") {
         const time24 = inputs.time.value.trim();
+
+        if (!isValidHalfHour(time24)) {
+          alert("Time minutes must be 00 or 30.");
+          return;
+        }
+
         msg = generateAppointmentReminderMessageToday(time24);
 
-      } else if (t === "6") {
+      } else if (t === "7") {
         const name = inputs.name.value.trim();
         const dbsStatus = inputs.dbsStatus.value.trim();
         const contact = inputs.contact.value.trim();
@@ -790,6 +903,10 @@ www.pcolicenceservices.co.uk
           alert("Contact must be exactly 11 digits.");
           return;
         }
+        if (!isValidHalfHour(startTime24)) {
+          alert("Start time minutes must be 00 or 30.");
+          return;
+        }
 
         msg = generateOnlineApplicationAndTrainingMessage(
           name,
@@ -797,31 +914,6 @@ www.pcolicenceservices.co.uk
           contact,
           dateISO,
           startTime24
-        );
-
-      } else if (t === "7") {
-        const name = inputs.name.value.trim();
-        let note = inputs.note.value.trim();
-        if (note) {
-          note = "(" + note + ")";
-        }
-        const contact = inputs.contact.value.trim();
-        const dateISO = inputs.date.value.trim();
-        const startTime24 = inputs.startTime.value.trim();
-        const due = inputs.due.value.trim();
-
-        if (!validateContact(contact)) {
-          alert("Contact must be exactly 11 digits.");
-          return;
-        }
-
-        msg = generateTopographicalSkillTrainingMessage(
-          name,
-          note,
-          contact,
-          dateISO,
-          startTime24,
-          due
         );
 
       } else if (t === "8") {
@@ -837,6 +929,39 @@ www.pcolicenceservices.co.uk
 
         if (!validateContact(contact)) {
           alert("Contact must be exactly 11 digits.");
+          return;
+        }
+        if (!isValidHalfHour(startTime24)) {
+          alert("Start time minutes must be 00 or 30.");
+          return;
+        }
+
+        msg = generateTopographicalSkillTrainingMessage(
+          name,
+          note,
+          contact,
+          dateISO,
+          startTime24,
+          due
+        );
+
+      } else if (t === "9") {
+        const name = inputs.name.value.trim();
+        let note = inputs.note.value.trim();
+        if (note) {
+          note = "(" + note + ")";
+        }
+        const contact = inputs.contact.value.trim();
+        const dateISO = inputs.date.value.trim();
+        const startTime24 = inputs.startTime.value.trim();
+        const due = inputs.due.value.trim();
+
+        if (!validateContact(contact)) {
+          alert("Contact must be exactly 11 digits.");
+          return;
+        }
+        if (!isValidHalfHour(startTime24)) {
+          alert("Start time minutes must be 00 or 30.");
           return;
         }
 
